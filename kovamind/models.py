@@ -133,14 +133,10 @@ class SurpriseResult:
     score: float
     route: str
     content: str = ""
-    metadata: dict = None
-
-    def __post_init__(self):
-        if self.metadata is None:
-            self.metadata = {}
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
-    def from_dict(cls, data: dict) -> "SurpriseResult":
+    def from_dict(cls, data: dict[str, Any]) -> "SurpriseResult":
         return cls(
             score=float(data.get("surprise_score", data.get("score", 0.0))),
             route=data.get("route", "update"),
