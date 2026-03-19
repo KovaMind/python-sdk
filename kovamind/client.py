@@ -198,6 +198,91 @@ class KovaMind:
         data = self._get("/health", {})
         return HealthStatus.from_dict(data)
 
+    # -- Vault --
+
+    def vault_status(self) -> dict[str, Any]:
+        """Check if the vault is locked or unlocked.
+
+        Returns:
+            Dict with 'status' key ('locked' or 'unlocked').
+        """
+        return self._get("/vault/status", {})
+
+    def vault_store(
+        self,
+        agent_id: str,
+        label: str,
+        value: str,
+        *,
+        tags: str | None = None,
+    ) -> dict[str, Any]:
+        """Store an encrypted secret in the vault.
+
+        Args:
+            agent_id: The agent storing the secret.
+            label: Name for this secret (e.g., 'aws-staging-key').
+            value: The secret value to encrypt and store.
+            tags: Optional comma-separated tags.
+
+        Returns:
+            Dict with 'id', 'label', and 'hash' keys.
+        """
+        payload: dict[str, Any] = {
+            "agent_id": agent_id,
+            "label": label,
+            "value": value,
+        }
+        if tags is not None:
+            payload["tags"] = tags
+        return self._post("/vault/secrets", payload)
+
+    def vault_get(
+        self,
+        agent_id: str,
+        secret_id: str,
+    ) -> dict[str, Any]:
+        """Retrieve a decrypted secret from the vault.
+
+        Args:
+            agent_id: The agent retrieving the secret.
+            secret_id: The secret ID to retrieve.
+
+        Returns:
+            Dict with 'id' and 'value' keys.
+        """
+        return self._get(f"/vault/secrets/{secret_id}", {"agent_id": agent_id})
+
+    def vault_list(
+        self,
+        agent_id: str,
+    ) -> list[dict[str, Any]]:
+        """List stored secret names (not values).
+
+        Args:
+            agent_id: The agent listing secrets.
+
+        Returns:
+            List of dicts with 'id', 'label', 'tags', 'created_at' keys.
+        """
+        data = self._get("/vault/secrets", {"agent_id": agent_id})
+        return data.get("secrets", [])
+
+    def vault_delete(
+        self,
+        agent_id: str,
+        secret_id: str,
+    ) -> dict[str, Any]:
+        """Permanently destroy a secret from the vault.
+
+        Args:
+            agent_id: The agent deleting the secret.
+            secret_id: The secret ID to destroy.
+
+        Returns:
+            Dict with 'status' and 'destroyed' keys.
+        """
+        return self._delete(f"/vault/secrets/{secret_id}", {"agent_id": agent_id})
+
     # -- Internal helpers --
 
     def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
@@ -207,6 +292,10 @@ class KovaMind:
     def _get(self, path: str, params: dict[str, Any]) -> dict[str, Any]:
         url = f"{self._base_url}{path}"
         return self._request_with_retry("GET", url, params=params)
+
+    def _delete(self, path: str, params: dict[str, Any]) -> dict[str, Any]:
+        url = f"{self._base_url}{path}"
+        return self._request_with_retry("DELETE", url, params=params)
 
     def _request_with_retry(self, method: str, url: str, **kwargs: Any) -> dict[str, Any]:
         delay = _RETRY_BASE_DELAY
