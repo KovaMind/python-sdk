@@ -225,6 +225,7 @@ class KovaMind:
 
             if attempt < _MAX_RETRIES - 1:
                 sleep_time = float(retry_after) if retry_after is not None else delay
+                sleep_time = min(sleep_time, 300.0)  # cap at 5 minutes
                 time.sleep(sleep_time)
                 delay *= 2
             else:
