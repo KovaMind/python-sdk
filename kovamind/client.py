@@ -79,7 +79,6 @@ class KovaMind:
         user_id: str,
         *,
         session_id: str | None = None,
-        **kwargs: Any,
     ) -> ExtractResult:
         """Extract memory patterns from a list of conversation messages.
 
@@ -87,7 +86,6 @@ class KovaMind:
             conversation: List of message dicts with ``role`` and ``content`` keys.
             user_id: The user whose memory is being updated.
             session_id: Optional session identifier for buffering.
-            **kwargs: Additional fields forwarded to the API payload.
 
         Returns:
             ExtractResult with the extracted patterns.
@@ -95,7 +93,6 @@ class KovaMind:
         payload: dict[str, Any] = {
             "conversation": conversation,
             "user_id": user_id,
-            **kwargs,
         }
         if session_id is not None:
             payload["session_id"] = session_id
@@ -110,7 +107,6 @@ class KovaMind:
         *,
         max_patterns: int = 10,
         min_confidence: float = 0.3,
-        **kwargs: Any,
     ) -> RecallResult:
         """Retrieve memory patterns relevant to a context string.
 
@@ -128,7 +124,6 @@ class KovaMind:
             "user_id": user_id,
             "max_patterns": max_patterns,
             "min_confidence": min_confidence,
-            **kwargs,
         }
         data = self._post("/memory/retrieve", payload)
         return RecallResult.from_dict(data, query=context)
@@ -139,7 +134,6 @@ class KovaMind:
         reinforcement_type: str,
         *,
         context: str | None = None,
-        **kwargs: Any,
     ) -> ReinforcementResult:
         """Reinforce (confirm, deny, or adjust) a stored pattern.
 
@@ -154,7 +148,6 @@ class KovaMind:
         payload: dict[str, Any] = {
             "pattern_id": pattern_id,
             "reinforcement_type": reinforcement_type,
-            **kwargs,
         }
         if context is not None:
             payload["context"] = context
@@ -166,7 +159,6 @@ class KovaMind:
         self,
         content: str,
         user_id: str,
-        **kwargs: Any,
     ) -> SurpriseResult:
         """Score the surprise of new content against existing memories.
 
@@ -177,14 +169,13 @@ class KovaMind:
         Returns:
             SurpriseResult with score and route.
         """
-        payload: dict[str, Any] = {"content": content, "user_id": user_id, **kwargs}
+        payload: dict[str, Any] = {"content": content, "user_id": user_id}
         data = self._post("/memory/surprise", payload)
         return SurpriseResult.from_dict(data)
 
     def context(
         self,
         conversation_id: str,
-        **kwargs: Any,
     ) -> EmotionalContext:
         """Retrieve the emotional/contextual state for a conversation.
 
@@ -194,7 +185,7 @@ class KovaMind:
         Returns:
             EmotionalContext.
         """
-        params: dict[str, Any] = {"conversation_id": conversation_id, **kwargs}
+        params: dict[str, Any] = {"conversation_id": conversation_id}
         data = self._get("/memory/context", params)
         return EmotionalContext.from_dict(data, conversation_id=conversation_id)
 
