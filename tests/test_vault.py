@@ -116,3 +116,12 @@ class TestNoPlantext:
                 # Check vault methods don't return raw credential fields
                 assert "decrypt" not in content, f"Found 'decrypt' in {path}"
                 assert "plaintext" not in content.lower() or "no plaintext" in content.lower() or "never" in content.lower(), f"Suspicious 'plaintext' in {path}"
+
+
+class TestVaultFind:
+    def test_vault_find_returns_matches(self, client):
+        with patch.object(client._session, "request", return_value=_mock_response({"results": [{"handle": "h1", "label": "GitHub", "schema_type": "username_password", "score": 0.95}]})):
+            result = client.vault_find("GitHub")
+            assert len(result) == 1
+            assert result[0]["label"] == "GitHub"
+            assert "password" not in result[0]

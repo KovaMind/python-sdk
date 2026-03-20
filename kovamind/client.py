@@ -234,11 +234,19 @@ class KovaMind:
         data = self._get("/vault/v2/handles", {})
         return data.get("handles", [])
 
-    def vault_execute(self, handle: str, action: str, target: str, mapping: dict | None = None) -> dict:
+    def vault_find(self, query: str) -> list[dict]:
+        """Find credentials matching a query. Returns handles with scores, no values."""
+        data = self._get(f"/vault/v2/find?q={query}", {})
+        return data.get("results", [])
+
+    def vault_execute(self, handle: str = "", action: str = "", target: str = "",
+                      mapping: dict | None = None, auto_detect: str | None = None) -> dict:
         """Execute an action using a credential. Never returns credential values."""
         payload = {"handle": handle, "action": action, "target": target}
         if mapping is not None:
             payload["mapping"] = mapping
+        if auto_detect is not None:
+            payload["auto_detect"] = auto_detect
         return self._post("/vault/v2/execute", payload)
 
     def vault_recover(self, words: list[str], new_passphrase: str) -> dict:
