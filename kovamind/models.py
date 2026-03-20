@@ -144,3 +144,61 @@ class SurpriseResult:
             metadata={k: v for k, v in data.items()
                       if k not in ("surprise_score", "score", "route", "content")},
         )
+
+
+@dataclass
+class VaultSetupResult:
+    """Result from vault setup."""
+
+    status: str
+    recovery_words: list[str]
+    raw: dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "VaultSetupResult":
+        return cls(status=data.get("status", ""), recovery_words=data.get("recovery_words", []), raw=data)
+
+
+@dataclass
+class VaultHandle:
+    """An opaque handle for a vault credential."""
+
+    handle: str
+    label: str
+    schema_type: str
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "VaultHandle":
+        return cls(handle=data.get("handle", ""), label=data.get("label", ""), schema_type=data.get("schema_type", ""))
+
+
+@dataclass
+class VaultCredentialMeta:
+    """Metadata for a vault credential (no secret values)."""
+
+    id: str
+    label: str
+    schema_type: str
+    tags: str | None = None
+    created_at: str = ""
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "VaultCredentialMeta":
+        return cls(id=data.get("id", ""), label=data.get("label", ""), schema_type=data.get("schema_type", ""),
+                   tags=data.get("tags"), created_at=data.get("created_at", ""))
+
+
+@dataclass
+class VaultExecuteResult:
+    """Result from vault execute (never contains credential values)."""
+
+    success: bool
+    output: str
+    error: str | None = None
+    status_code: int | None = None
+    raw: dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "VaultExecuteResult":
+        return cls(success=data.get("success", False), output=data.get("output", ""),
+                   error=data.get("error"), status_code=data.get("status_code"), raw=data)

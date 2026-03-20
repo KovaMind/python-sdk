@@ -33,9 +33,13 @@ from .models import (
     RecallResult,
     ReinforcementResult,
     SurpriseResult,
+    VaultCredentialMeta,
+    VaultExecuteResult,
+    VaultHandle,
+    VaultSetupResult,
 )
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 __all__ = [
     "KovaMind",
     "KovaMindError",
@@ -50,4 +54,8 @@ __all__ = [
     "EmotionalContext",
     "HealthStatus",
     "SurpriseResult",
+    "VaultCredentialMeta",
+    "VaultExecuteResult",
+    "VaultHandle",
+    "VaultSetupResult",
 ]

@@ -198,6 +198,53 @@ class KovaMind:
         data = self._get("/health", {})
         return HealthStatus.from_dict(data)
 
+
+    # -- Vault v2 --
+
+    def vault_setup(self, passphrase: str) -> dict:
+        """First-time vault setup. Returns recovery words."""
+        return self._post("/vault/v2/setup", {"passphrase": passphrase})
+
+    def vault_unlock(self, passphrase: str) -> dict:
+        """Unlock the vault."""
+        return self._post("/vault/v2/unlock", {"passphrase": passphrase})
+
+    def vault_lock(self) -> dict:
+        """Lock the vault."""
+        return self._post("/vault/v2/lock", {})
+
+    def vault_store(self, label: str, schema_type: str, fields: dict, tags: str | None = None) -> dict:
+        """Store a credential. Returns opaque handle."""
+        payload = {"label": label, "schema_type": schema_type, "fields": fields}
+        if tags is not None:
+            payload["tags"] = tags
+        return self._post("/vault/v2/credentials", payload)
+
+    def vault_list(self) -> list[dict]:
+        """List credentials (metadata only, no values)."""
+        data = self._get("/vault/v2/credentials", {})
+        return data.get("credentials", [])
+
+    def vault_delete(self, credential_id: str) -> dict:
+        """Delete a credential."""
+        return self._delete(f"/vault/v2/credentials/{credential_id}")
+
+    def vault_handles(self) -> list[dict]:
+        """List opaque handles (handle, label, schema_type only)."""
+        data = self._get("/vault/v2/handles", {})
+        return data.get("handles", [])
+
+    def vault_execute(self, handle: str, action: str, target: str, mapping: dict | None = None) -> dict:
+        """Execute an action using a credential. Never returns credential values."""
+        payload = {"handle": handle, "action": action, "target": target}
+        if mapping is not None:
+            payload["mapping"] = mapping
+        return self._post("/vault/v2/execute", payload)
+
+    def vault_recover(self, words: list[str], new_passphrase: str) -> dict:
+        """Recover vault with 12 recovery words."""
+        return self._post("/vault/v2/recover", {"words": words, "new_passphrase": new_passphrase})
+
     # -- Internal helpers --
 
     def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
@@ -207,6 +254,10 @@ class KovaMind:
     def _get(self, path: str, params: dict[str, Any]) -> dict[str, Any]:
         url = f"{self._base_url}{path}"
         return self._request_with_retry("GET", url, params=params)
+
+    def _delete(self, path: str) -> dict[str, Any]:
+        url = f"{self._base_url}{path}"
+        return self._request_with_retry("DELETE", url)
 
     def _request_with_retry(self, method: str, url: str, **kwargs: Any) -> dict[str, Any]:
         delay = _RETRY_BASE_DELAY
