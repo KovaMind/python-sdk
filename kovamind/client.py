@@ -236,7 +236,8 @@ class KovaMind:
 
     def vault_find(self, query: str) -> list[dict]:
         """Find credentials matching a query. Returns handles with scores, no values."""
-        data = self._get(f"/vault/v2/find?q={query}", {})
+        import urllib.parse
+        data = self._get(f"/vault/v2/find?q={urllib.parse.quote(query)}", {})
         return data.get("results", [])
 
     def vault_execute(self, handle: str = "", action: str = "", target: str = "",
