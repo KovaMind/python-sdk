@@ -53,7 +53,7 @@ print(f"Score: {surprise.score:.2f}, Route: {surprise.route}")
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `api_key` | required | Your `km_live_...` or `km_test_...` key |
-| `base_url` | `https://api.kovamind.ai` | API base URL |
+| `base_url` | `https://api.kovamind.io` | API base URL |
 | `timeout` | `30` | Request timeout in seconds |
 | `session` | `None` | Optional custom `requests.Session` |
 

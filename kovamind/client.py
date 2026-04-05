@@ -23,7 +23,7 @@ from .models import (
 _MAX_RETRIES = 3
 _RETRY_BASE_DELAY = 1.0
 _DEFAULT_TIMEOUT = 30
-_DEFAULT_BASE_URL = "https://api.kovamind.ai"
+_DEFAULT_BASE_URL = "https://api.kovamind.io"
 
 
 class KovaMind:
@@ -49,7 +49,7 @@ class KovaMind:
 
     Args:
         api_key: Your Kova Mind API key (``km_live_...`` or ``km_test_...``).
-        base_url: Base URL for the Kova Mind API (default: https://api.kovamind.ai).
+        base_url: Base URL for the Kova Mind API (default: https://api.kovamind.io).
         timeout: HTTP request timeout in seconds (default 30).
         session: Optional custom :class:`requests.Session`.
     """

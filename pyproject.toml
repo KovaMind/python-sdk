@@ -37,8 +37,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://kovamind.ai"
-Documentation = "https://kovamind.ai/docs"
+Homepage = "https://kovamind.io"
+Documentation = "https://kovamind.io/docs"
 Repository = "https://github.com/KovaMind/python-sdk"
 Issues = "https://github.com/KovaMind/python-sdk/issues"
 

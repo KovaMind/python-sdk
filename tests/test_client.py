@@ -25,7 +25,7 @@ from kovamind.models import (
     SurpriseResult,
 )
 
-BASE_URL = "https://api.kovamind.ai"
+BASE_URL = "https://api.kovamind.io"
 API_KEY = "km_live_testhexhexhexhexhexhexhexhex01"
 
 
@@ -307,7 +307,7 @@ def test_custom_base_url():
 
 def test_default_base_url():
     kova = KovaMind(api_key=API_KEY)
-    assert kova._base_url == "https://api.kovamind.ai"
+    assert kova._base_url == "https://api.kovamind.io"
 
 
 def test_trailing_slash_stripped():
